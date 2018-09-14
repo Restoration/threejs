@@ -8,26 +8,37 @@
     <script src="build/three.js"></script>
     <script>
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-
+      var fov = 75;
+      var aspect = window.innerWidth/window.innerHeight;
+      var near = 0.1;
+      var far = 1000;
+      var camera = new THREE.PerspectiveCamera(fov,aspect,near,far);
       var renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
+      
+      // Load the background texture
+      var texture = THREE.ImageUtils.loadTexture( '1.jpg' );
+      var backgroundMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 0),
+        new THREE.MeshBasicMaterial({
+            map: texture
+        }));
+      backgroundMesh .material.depthTest = false;
+      backgroundMesh .material.depthWrite = false;
+      // Create your background scene
+      var backgroundScene = new THREE.Scene();
+      var backgroundCamera = new THREE.Camera();
+      backgroundScene.add(backgroundCamera );
+      backgroundScene.add(backgroundMesh );
 
-      var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-      var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-      var cube = new THREE.Mesh( geometry, material );
-      scene.add( cube );
-
-      camera.position.z = 5;
-
+      scene.add(backgroundScene);
+      camera.position.z = 50;
       var animate = function () {
         requestAnimationFrame( animate );
-
-        cube.rotation.x += 0.01;
-          cube.rotation.y += 0.01;
-
-        renderer.render( scene, camera );
+        //mesh.rotation.x += 0.01;
+        //mesh.rotation.y += 0.01;
+        renderer.render( backgroundScene ,camera );
       };
 
       animate();
